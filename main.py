@@ -1,4 +1,4 @@
-import requests
+import requests, time
 import json
 from collections import Counter
 
@@ -77,8 +77,6 @@ def add_sus_baddy(user_id):
 
 
 # ----------- Certified Groups Functions -----------
-
-
 def load_certified_groups():
     try:
         with open(CERTIFIED_GROUPS_FILE, 'r') as f:
@@ -86,11 +84,9 @@ def load_certified_groups():
     except (FileNotFoundError, json.JSONDecodeError):
         return []
 
-
 def save_certified_groups(group_ids):
     with open(CERTIFIED_GROUPS_FILE, 'w') as f:
         json.dump(group_ids, f, indent=4)
-
 
 def add_certified_group(group_id):
     group_id = str(group_id)  # Ensure ID is stored as a string
@@ -102,20 +98,19 @@ def add_certified_group(group_id):
     else:
         print(f"Group ID {group_id} already exists in Certified Groups.")
 
-
 # ----------- Friend Ranking and Fetching -----------
 def get_friends(user_id):
     url = f"https://friends.roblox.com/v1/users/{user_id}/friends"
     response = requests.get(url)
     if response.status_code == 200:
-        return [str(friend['id']) for friend in response.json()['data']
-                ]  # Convert IDs to strings
+        friends = response.json().get('data', [])
+        return [
+            str(friend['id']) for friend in friends 
+            if not friend.get('isBanned', False) and not friend.get('isDeleted', False)
+        ]
     else:
-        print(
-            f"Problem fetching friends for user {user_id}: {response.status_code}"
-        )
+        print(f"Problem fetching friends for user {user_id}: {response.status_code}")
         return []
-
 
 def rank_shared_friends(user_ids):
     all_friends = []
@@ -156,18 +151,25 @@ def get_group_members(group_id, limit=None):
 
     return members
 
-
 def rank_shared_members(group_ids):
     all_members = []
     for group_id in group_ids:
         all_members.extend(get_group_members(group_id))
 
-    print(all_members)
+    member_counts = Counter(all_members)
+    shared_members = [
+        member for member, count in member_counts.items() if count > 1
+    ]
 
+    ranked_members = sorted(shared_members,
+                            key=lambda x: member_counts[x],
+                            reverse=True)
+
+    print("Total Members (temp):", len(all_members))
+    
+    return ranked_members, member_counts
 
 # ----------- Main Command Panel pre-frontend -----------
-
-
 def main():
     while True:
         print("\nCommands:")
@@ -175,9 +177,9 @@ def main():
         print("2. Show ranked shared friends (Certified Baddies only)")
         print("3. Move a user ID from Sus Baddies to Certified Baddies")
         print("4. Add group ID to Certified Groups")
-        print("5. Get group plrs")
+        print("5. Show ranked shared members (Certified Groups only)")
 
-        command = input("Enter a command (1, 2, 3, or 4): ")
+        command = input("Enter a command (1, 2, 3, 4, 5): ")
 
         if command == '1':
             user_id = input("Enter the user ID to add to Certified Baddies: ")
@@ -186,23 +188,17 @@ def main():
         elif command == '2':
             user_ids = load_certified_baddies()
             if user_ids:
-                ranked_shared_friends, friend_counts = rank_shared_friends(
-                    user_ids)
+                ranked_shared_friends, friend_counts = rank_shared_friends(user_ids)
                 print("\nRanked shared friends (Certified Baddies):")
                 for i, friend_id in enumerate(ranked_shared_friends, 1):
                     print(
                         f"{i}. User ID: {friend_id}, Shared by: {friend_counts[friend_id]} users"
                     )
-
-                move_to_sus = input(
-                    "\nDo you want to add the top ranked users to Sus Baddies? (yes/no): "
-                ).lower()
-                if move_to_sus == 'yes':
+                
+                move_to_sus_baddies = input("\nDo you want to add the top ranked users to Sus Baddies? (yes/no): ").lower()
+                if move_to_sus_baddies == 'yes':
                     try:
-                        x = int(
-                            input(
-                                "How many of the top ranked users would you like to add?: "
-                            ))
+                        x = int(input("How many of the top ranked users would you like to add?: "))
                         top_users = ranked_shared_friends[:x]
                         for user in top_users:
                             add_sus_baddy(user)
@@ -218,8 +214,27 @@ def main():
             move_sus_to_certified(user_id)
 
         elif command == '4':
-            group_id = input("Enter the group ID to add: ")
+            group_id = input("Enter the group ID to add to Certified Groups: ")
+            add_certified_group(group_id)
 
+        elif command == '5':
+            group_ids = load_certified_groups()
+            if group_ids:
+                ranked_shared_members, member_counts = rank_shared_members(group_ids)
+                print("\nRanked shared members (Certified Groups):")
+                for i, member_id in enumerate(ranked_shared_members, 1):
+                    print(f"{i}. User ID: {member_id}, Shared by: {member_counts[member_id]} users")
+
+                move_to_sus_baddies = input("\nDo you want to add the top ranked users to Sus Baddies, to be manually reviewed? (yes/no): ").lower()
+                if move_to_sus_baddies == 'yes':
+                    try:
+                        x = int(input("How many of the top ranked users would you like to add?: "))
+                        top_users = ranked_shared_members[:x]
+                        for user in top_users:
+                            add_sus_baddy(user)
+                    except ValueError:
+                        print("Invalid number entered. Returning to the menu.")
+                
         else:
             print("Invalid command. Please try again.")
 
