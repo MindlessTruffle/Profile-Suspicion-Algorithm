@@ -25,7 +25,23 @@ def add_groups():
                                groups=main.load_certified_groups())
 
     return render_template('add_groups.html', request=request, groups=main.load_certified_groups())
-    
+
+@app.route('/add_accounts', methods=['GET', 'POST'])
+def add_accounts():
+    if request.method == 'POST':
+        accountIds = request.form["accountIds"].split(",")
+        for accountId in accountIds:
+            try:
+                int(accountId)
+                main.add_certified_baddy(accountId)
+            except:
+                print("Non-Int")
+
+        return render_template('add_accounts.html',
+                               request=request,
+                               accounts=main.load_certified_baddies())
+
+    return render_template('add_accounts.html', request=request, accounts=main.load_certified_baddies())
 
 @app.route('/analyse_groups', methods=['GET', 'POST'])
 def analyse_groups():
