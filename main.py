@@ -7,7 +7,7 @@ SUS_BADDIES_FILE = 'sus_baddies.json'
 
 CERTIFIED_GROUPS_FILE = 'certified_groups.json'
 
-# ----------- Certified Baddies Functions -----------z
+# ----------- Certified Baddies Functions -----------
 
 
 def load_certified_baddies():
@@ -24,7 +24,7 @@ def save_certified_baddies(user_ids):
 
 
 def add_certified_baddy(user_id):
-    user_id = str(user_id)  # Ensure ID is stored as a string
+    user_id = str(user_id)
     user_ids = load_certified_baddies()
     if user_id not in user_ids:
         user_ids.append(user_id)
@@ -35,7 +35,7 @@ def add_certified_baddy(user_id):
 
 
 def move_sus_to_certified(user_id):
-    user_id = str(user_id)  # Ensure ID is treated as a string
+    user_id = str(user_id)
     sus_baddies = load_sus_baddies()
     certified_baddies = load_certified_baddies()
 
@@ -66,7 +66,7 @@ def save_sus_baddies(user_ids):
 
 
 def add_sus_baddy(user_id):
-    user_id = str(user_id)  # Ensure ID is stored as a string
+    user_id = str(user_id)
     user_ids = load_sus_baddies()
     if user_id not in user_ids:
         user_ids.append(user_id)
@@ -89,7 +89,7 @@ def save_certified_groups(group_ids):
         json.dump(group_ids, f, indent=4)
 
 def add_certified_group(group_id):
-    group_id = str(group_id)  # Ensure ID is stored as a string
+    group_id = str(group_id)
     group_ids = load_certified_groups()
     if group_id not in group_ids:
         group_ids.append(group_id)

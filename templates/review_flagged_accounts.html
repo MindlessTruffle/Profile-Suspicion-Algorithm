@@ -3,15 +3,31 @@
 {% block breadcrumb %}Review Flagged Accounts{% endblock %}
 
 {% block content %}
-    <h1>Review Flags</h1>
-    <!-- <p class="important">
-      Input a comma-separated list of group IDs.
-    </p> -->
+<h1 class="text-center">Review Flagged Accounts</h1>
 
-  <!-- <p>{{request}}</p> -->
-  <!-- <h3>{{groups}}</h3> -->
 <form method="post">
-  
+    <div class="row">
+        {% for accountId in accounts_to_review %}
+            <div class="col-md-2 mb-4">
+                <div class="card" style="max-width: 18rem; margin: auto;">
+                    <div class="card-body text-center">
+                        <a href="https://www.roblox.com/users/{{ accountId }}/profile" target="_blank">
+                            <h3 class="card-title">{{ accountId }}</h3>
+                        </a>
+                        <div class="d-flex justify-content-center mt-3">
+                            <!-- Safe Button -->
+                            <button type="submit" name="safeButton" value="{{ accountId }}" class="btn btn-success mx-2">Safe</button>
+                            <!-- Unsafe Button -->
+                            <button type="submit" name="unsafeButton" value="{{ accountId }}" class="btn btn-danger mx-2">Unsafe</button>
+                            <!-- Pass Button -->
+                            <button type="submit" name="passButton" value="{{ accountId }}" class="btn btn-warning mx-2">Pass</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 </form>
+
 
 {% endblock %}
