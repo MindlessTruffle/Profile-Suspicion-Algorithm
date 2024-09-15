@@ -7,7 +7,7 @@ SUS_BADDIES_FILE = 'sus_baddies.json'
 
 CERTIFIED_GROUPS_FILE = 'certified_groups.json'
 
-# ----------- Certified Baddies Functions -----------
+# ----------- Certified Baddies Functions -----------z
 
 
 def load_certified_baddies():

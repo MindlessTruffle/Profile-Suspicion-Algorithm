@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Add Groups{% endblock %}
+{% block breadcrumb %}Add Groups{% endblock %}
+
+{% block content %}
+    <h1>Add Groups</h1>
+    <!-- <p class="important">
+      Input a comma-separated list of group IDs.
+    </p> -->
+
+  <!-- <p>{{request}}</p> -->
+  <!-- <h3>{{groups}}</h3> -->
+<form  method="post">
+  <div class="mb-3">
+    <textarea class="form-control" placeholder="Input group IDs as a comma-separated list..." name="groupIds"></textarea>
+    <!-- <label for="floatingTextarea">{{groups}}</label> -->
+    <label for="floatingTextarea">*Should be manually confirmed as against TOS<label>
+  </div>
+
+  <button type="submit" class="btn btn-primary">Submit</button>
+  
+  <h1>Existing Groups</h1>
+
+  <table class="table table-dark">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Group ID</th>
+        <th scope="col">Access Link</th>
+        <!-- <th scope="col">Name</th>
+        <th scope="col">Actions</th> -->
+      </tr>
+    </thead>
+    <tbody>
+      
+      {% for group in groups %}
+      <tr>
+        <th scope="row">{{loop.index}}</th>
+        <td>{{group}}</td>
+        <th scope="col"><a href="https://roblox.com/groups/{{group}}" target="_blank">{{group}}</a></th>
+        <!-- <td>@</td> -->
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  
+</form>
+
+{% endblock %}
