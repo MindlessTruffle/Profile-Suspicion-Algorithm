@@ -139,4 +139,13 @@ def analyse_accounts():
                            ranked_accounts=sorted_rank_data,
                            result_found=result_found)
 
+@app.route('/review_flagged_accounts', methods=['GET', 'POST'])
+def review_flagged_accounts():
+    if request.method == 'POST':
+        if 'runButton' in request.form:
+            pass
+
+    return render_template('review_flagged_accounts.html',
+                           request=request)
+
 app.run(host="0.0.0.0")
