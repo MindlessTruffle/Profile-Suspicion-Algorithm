@@ -91,4 +91,52 @@ def analyse_groups():
                            ranked_accounts=sorted_rank_data,
                            result_found=result_found)
 
+@app.route('/analyse_accounts', methods=['GET', 'POST'])
+def analyse_accounts():
+    sorted_rank_data = []
+    result_found = False
+    if request.method == 'POST':
+        # Handle the "Run it" button submission
+        if 'runButton' in request.form:
+            account_ids = main.load_certified_baddies()
+            if account_ids:
+                ranked_shared_friends, friend_counts = main.rank_shared_friends(account_ids)
+                for i, account_id in enumerate(ranked_shared_friends, 1):
+                    sorted_rank_data.append((account_id, friend_counts[account_id]))
+                result_found = True  # Result is ready, show the form and button
+
+        # Handle form submission (flagThreshold and form submission)
+        elif 'submitButton' in request.form and 'flagThreshold' in request.form:
+            flag_threshold = int(request.form["flagThreshold"])
+            print(f"Flag Threshold: {flag_threshold}")
+
+            # Parse the ranked_accounts from the form data
+            ranked_accounts = []
+            i = 0
+            while f'account_id_{i}' in request.form and f'count_{i}' in request.form:
+                account_id = request.form[f'account_id_{i}']
+                count = int(request.form[f'count_{i}'])
+                ranked_accounts.append((account_id, count))
+                i += 1
+
+            # Limit the ranked_accounts to the flag_threshold
+            flagged_accounts = ranked_accounts[:flag_threshold]
+
+            # Print the ranked_accounts
+            print("Ranked accounts:")
+            for account in flagged_accounts:
+                print(f"Account ID: {account[0]}, Count: {account[1]}")
+
+                main.add_sus_baddy(account[0])
+
+            # Set result_found to True so the form and results table are displayed again
+            result_found = True
+            sorted_rank_data = ranked_accounts
+
+    # Render the template and pass whether results were found or not
+    return render_template('analyse_accounts.html',
+                           request=request,
+                           ranked_accounts=sorted_rank_data,
+                           result_found=result_found)
+
 app.run(host="0.0.0.0")
