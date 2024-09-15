@@ -125,8 +125,6 @@ def analyse_accounts():
                            ranked_accounts=sorted_rank_data,
                            result_found=result_found)
 
-import json
-
 @app.route('/review_flagged_accounts', methods=['GET', 'POST'])
 def review_flagged_accounts():
     with open('sus_baddies.json', 'r') as file:
@@ -152,7 +150,7 @@ def review_flagged_accounts():
         with open('sus_baddies.json', 'w') as file:
             json.dump(data, file, indent=4)
 
-    accounts_to_review = data[:3]
+    accounts_to_review = data[:1]
     return render_template('review_flagged_accounts.html', accounts_to_review=accounts_to_review)
 
 
