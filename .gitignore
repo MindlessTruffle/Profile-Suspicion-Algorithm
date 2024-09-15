@@ -161,6 +161,8 @@ cython_debug/
 
 # Manual
 
-.pythonlibs
+.pythonlibs/
 poetry.lock
 pyproject.toml
+.replit
+replit.nix
